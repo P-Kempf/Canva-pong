@@ -34,6 +34,8 @@ class Element {
         this.speed = opciones.speed || 2;
         this.gravity = opciones.gravity;
         this.circle = opciones.circle;
+        this.isMovingUp = opciones.isMovingUp;
+        this.isMovingDown = opciones.isMovingDown
 
     }
 }
@@ -45,6 +47,8 @@ const jugador1 = new Element({
     height: 80,
     color: "#0000ff",
     gravity: 2,
+    isMovingDown: false,
+    isMovingUp: false
 })
 
 const jugador2 = new Element({
@@ -54,6 +58,8 @@ const jugador2 = new Element({
     height: 80,
     color: "#ff0000",
     gravity: 2,
+    isMovingDown: false,
+    isMovingUp: false
 })
 const pelota = new Element({
     x: canvas.width / 2 - 7.5,
@@ -89,9 +95,37 @@ const campoJugador2 = new Element({
     circle: true,
 })
 
+document.addEventListener('keydown', function (event) {
+    if (event.key === controles.jugador1.arriba) {
+        jugador1.isMovingUp = true;
+    } else if (event.key === controles.jugador1.abajo) {
+        jugador1.isMovingDown = true;
+    }
 
-const regex = /^[a-zA-Z0-9\s\xE2\x86\x90\xE2\x86\x91\xE2\x86\x92\xE2\x86\x93]*$/;
-;
+    if (event.key === controles.jugador2.arriba) {
+        jugador2.isMovingUp = true;
+    } else if (event.key === controles.jugador2.abajo) {
+        jugador2.isMovingDown = true;
+    }
+});
+
+document.addEventListener('keyup', function (event) {
+    if (event.key === controles.jugador1.arriba) {
+        jugador1.isMovingUp = false;
+    } else if (event.key === controles.jugador1.abajo) {
+        jugador1.isMovingDown = false;
+    }
+
+    if (event.key === controles.jugador2.arriba) {
+        jugador2.isMovingUp = false;
+    } else if (event.key === controles.jugador2.abajo) {
+        jugador2.isMovingDown = false;
+    }
+});
+
+
+
+
 
 
 
@@ -162,16 +196,14 @@ function guardarCambios() {
 function captureFirstKey(event, input) {
     event.preventDefault();
     const key = event.key.toLowerCase();
-    const nextInput = document.querySelector(`[tabIndex="${input.tabIndex+1}"]`);
-    if (regex.test(key)) {
-        // if input value contains a special character, remove it
-        console.log("es correcto")
-        input.value = key;
-        input.removeEventListener('keydown', captureFirstKey);
+    const nextInput = document.querySelector(`[tabIndex="${input.tabIndex + 1}"]`);
+
+    input.value = key;
+    input.removeEventListener('keydown', captureFirstKey);
     if (nextInput) {
-      nextInput.focus();
+        nextInput.focus();
     }
-    }
+
 }
 
 console.log(document.querySelector('input'))
@@ -211,7 +243,7 @@ window.addEventListener("keydown", presionarTecla, false);
 
 function presionarTecla(e) {
     const key = e.key
-    console.log(e.key)
+
     if (key == controles.jugador1.arriba && jugador1.y - jugador1.gravity > 0) {
         jugador1.y -= jugador1.gravity * 4;
     }
@@ -319,20 +351,33 @@ function colisionar() {
         pelota.x <= jugador2.x + jugador2.width &&
         pelota.y + pelota.height >= jugador2.y &&
         pelota.y <= jugador2.y + jugador2.height) {
-        pelota.speed = -pelota.speed;
-        pelota.gravity = Math.random() * 2 - 1;
-        pelota.speed *= 1.1;
-        pelota.gravity *= 1.1;
+        if (jugador2.isMovingUp) {
+            console.log("le diste en movimiento arriba")
+            pelota.gravity = pelota.gravity + Math.random() * 1.5;
+        }
+        if (jugador2.isMovingDown) {
+            console.log("le diste en movimiento abajo")
+            pelota.gravity = pelota.gravity - Math.random() * 1.5 - 1.5;
+        }
+
+        pelota.speed = -pelota.speed * 1.1;
     }
 
     if (pelota.x + pelota.width >= jugador1.x &&
         pelota.x <= jugador1.x + jugador1.width &&
         pelota.y + pelota.height >= jugador1.y &&
         pelota.y <= jugador1.y + jugador1.height) {
-        pelota.speed = -pelota.speed;
-        pelota.gravity = Math.random() * 2 - 1;
-        pelota.speed *= 1.1;
-        pelota.gravity *= 1.1;
+        console.log(jugador1.isMovingDown, jugador1.isMovingUp)
+        if (jugador1.isMovingUp) {
+            console.log("le diste en movimiento arriba")
+            pelota.gravity = pelota.gravity + Math.random() * 1.5;
+        }
+        if (jugador1.isMovingDown) {
+            console.log("le diste en movimiento abajo")
+            pelota.gravity = pelota.gravity - Math.random() * 1.5 - 1.5;
+        }
+        pelota.speed = -pelota.speed * 1.1;
+
     }
 
     // Detectar si la pelota ha tocado la pared y actualizar el marcador del jugador contrario
