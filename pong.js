@@ -3,14 +3,25 @@ const context = canvas.getContext("2d");
 canvas.width = 650;
 canvas.height = 400;
 
-let marcador1 = 0;
-let marcador2 = 0;
+
 let animacion
 // movimiento 
-var jugador1Subir = "w";
-var jugador1Bajar = "s";
-var jugador2Subir = "ArrowUp";
-var jugador2Bajar = "ArrowDown";
+let controles = {
+    jugador1: {
+        arriba: "w",
+        abajo: "s",
+        marcador: 0
+    },
+    jugador2: {
+        arriba: "ArrowUp",
+        abajo: "ArrowDown",
+        marcador: 0
+    }
+}
+
+
+
+
 
 class Element {
     constructor(opciones) {
@@ -78,6 +89,12 @@ const campoJugador2 = new Element({
     circle: true,
 })
 
+
+const regex = /^[a-zA-Z0-9\s\xE2\x86\x90\xE2\x86\x91\xE2\x86\x92\xE2\x86\x93]*$/;
+;
+
+
+
 const upKeyInput = document.getElementById('up-key-input-1');
 const downKeyInput = document.getElementById('down-key-input-1');
 const colorInput = document.getElementById('color-input-1');
@@ -87,10 +104,10 @@ const colorInput2 = document.getElementById('color-input-2');
 const titulojugador = document.getElementById('jugador-1');
 const titulojugador2 = document.getElementById('jugador-2');
 
-upKeyInput.value = jugador1Subir;
-downKeyInput.value = jugador1Bajar;
-upKeyInput2.value = jugador2Subir;
-downKeyInput2.value = jugador2Bajar;
+upKeyInput.value = controles.jugador1.arriba;
+downKeyInput.value = controles.jugador1.abajo;
+upKeyInput2.value = controles.jugador2.arriba;
+downKeyInput2.value = controles.jugador2.abajo;
 colorInput.value = jugador1.color;
 colorInput2.value = jugador2.color;
 titulojugador.style.color = jugador1.color;
@@ -127,10 +144,10 @@ document.addEventListener('keydown', (event) => {
 });
 
 function guardarCambios() {
-    jugador1Subir = upKeyInput.value;
-    jugador1Bajar = downKeyInput.value;
-    jugador2Subir = upKeyInput2.value;
-    jugador2Bajar = downKeyInput2.value;
+    controles.jugador1.arriba = upKeyInput.value;
+    controles.jugador1.abajo = downKeyInput.value;
+    controles.jugador2.arriba = upKeyInput2.value;
+    controles.jugador2.abajo = downKeyInput2.value;
     jugador1.color = colorInput.value;
     jugador2.color = colorInput2.value;
     titulojugador.style.color = jugador1.color;
@@ -144,37 +161,40 @@ function guardarCambios() {
 // Función para capturar la primera tecla que se pulse
 function captureFirstKey(event, input) {
     event.preventDefault();
-    const key = event.key;
-    const existingInput = document.querySelector(`input[value="${key}"]:not(#${input.id})`);
-    console.log(existingInput)
-    if (existingInput) {
-        existingInput.value = '';
+    const key = event.key.toLowerCase();
+    const nextInput = document.querySelector(`[tabIndex="${input.tabIndex+1}"]`);
+    if (regex.test(key)) {
+        // if input value contains a special character, remove it
+        console.log("es correcto")
+        input.value = key;
+        input.removeEventListener('keydown', captureFirstKey);
+    if (nextInput) {
+      nextInput.focus();
     }
-    input.value = key;
-    input.removeEventListener('keydown', captureFirstKey);
+    }
 }
 
 console.log(document.querySelector('input'))
 // Agregar eventos de clic a los campos de entrada
-upKeyInput.addEventListener('click', () => {
+upKeyInput.addEventListener('focus', () => {
     upKeyInput.addEventListener('keydown', (event) => {
         captureFirstKey(event, upKeyInput);
     });
 });
 
-downKeyInput.addEventListener('click', () => {
+downKeyInput.addEventListener('focus', () => {
     downKeyInput.addEventListener('keydown', (event) => {
         captureFirstKey(event, downKeyInput);
     });
 });
 
-upKeyInput2.addEventListener('click', () => {
+upKeyInput2.addEventListener('focus', () => {
     upKeyInput2.addEventListener('keydown', (event) => {
         captureFirstKey(event, upKeyInput2);
     });
 });
 
-downKeyInput2.addEventListener('click', () => {
+downKeyInput2.addEventListener('focus', () => {
     downKeyInput2.addEventListener('keydown', (event) => {
         captureFirstKey(event, downKeyInput2);
     });
@@ -192,17 +212,17 @@ window.addEventListener("keydown", presionarTecla, false);
 function presionarTecla(e) {
     const key = e.key
     console.log(e.key)
-    if (key == jugador1Subir && jugador1.y - jugador1.gravity > 0) {
+    if (key == controles.jugador1.arriba && jugador1.y - jugador1.gravity > 0) {
         jugador1.y -= jugador1.gravity * 4;
     }
-    else if (key == jugador1Bajar &&
+    else if (key == controles.jugador1.abajo &&
         jugador1.y + jugador1.height + jugador1.gravity < canvas.height) {
         jugador1.y += jugador1.gravity * 4;
     }
-    if (key == jugador2Subir && jugador2.y - jugador2.gravity > 0) {
+    if (key == controles.jugador2.arriba && jugador2.y - jugador2.gravity > 0) {
         jugador2.y -= jugador2.gravity * 4;
     }
-    else if (key == jugador2Bajar &&
+    else if (key == controles.jugador2.abajo &&
         jugador2.y + jugador2.height + jugador2.gravity < canvas.height) {
         jugador2.y += jugador2.gravity * 4;
     }
@@ -250,12 +270,12 @@ function drawElement(element) {
 function drawMarcador1() {
     context.font = "18px Arial";
     context.fillStyle = jugador1.color;
-    context.fillText(marcador1, canvas.width / 2 - 60, 30)
+    context.fillText(controles.jugador1.marcador, canvas.width / 2 - 60, 30)
 }
 function drawMarcador2() {
     context.font = "18px Arial";
     context.fillStyle = jugador2.color;
-    context.fillText(marcador2, canvas.width / 2 + 51, 30)
+    context.fillText(controles.jugador2.marcador, canvas.width / 2 + 51, 30)
 }
 function drawElements() {
     context.clearRect(0, 0, canvas.width, canvas.height)
@@ -317,12 +337,12 @@ function colisionar() {
 
     // Detectar si la pelota ha tocado la pared y actualizar el marcador del jugador contrario
     if (pelota.x <= 0) {
-        marcador2++;
+        controles.jugador2.marcador++;
         resetPelota();
     }
 
     if (pelota.x + pelota.width >= canvas.width) {
-        marcador1++;
+        controles.jugador1.marcador++;
         resetPelota();
     }
 
