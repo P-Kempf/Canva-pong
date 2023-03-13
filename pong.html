@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,8 +8,42 @@
     <link href="pong.css" rel="stylesheet">
     <title>Pong</title>
 </head>
+
 <body>
     <canvas id="pong" style="background-color: black;"></canvas>
-    <script src="pong.js"></script>
+    <!-- Menú de opciones -->
+    <div id="options-menu">
+        <h2>Opciones de juego</h2>
+        <div class="player-options">
+            <div class="player-option">
+                <h3 id="jugador-1">Jugador 1</h3>
+                <form>
+                    <label for="up-key-input-1">Arriba:</label>
+                    <input type="text" id="up-key-input-1" name="up-key-input-1">
+                    <label for="down-key-input-1">Abajo:</label>
+                    <input type="text" id="down-key-input-1" name="down-key-input-1">
+                    <label for="color-input-1">Color:</label>
+                    <input type="color" id="color-input-1" name="color-input-1">
+
+                </form>
+            </div>
+            <div class="player-option">
+                <h3 id="jugador-2">Jugador 2</h3>
+                <form>
+                    <label for="up-key-input-2">Arriba:</label>
+                    <input type="text" id="up-key-input-2" name="up-key-input-2">
+                    <label for="down-key-input-2">Abajo:</label>
+                    <input type="text" id="down-key-input-2" name="down-key-input-2">
+                    <label for="color-input-2">Color:</label>
+                    <input type="color" id="color-input-2" name="color-input-2">
+                </form>
+            </div>
+        </div>
+        <button onclick="guardarCambios()"> Guardar Cambios</button>
+    </div>
+
+    <script  src="pong.js"></script>
+ 
 </body>
+
 </html>

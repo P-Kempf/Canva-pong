@@ -5,47 +5,12 @@ canvas.height = 400;
 
 let marcador1 = 0;
 let marcador2 = 0;
-
+let animacion
 // movimiento 
 var jugador1Subir = "w";
 var jugador1Bajar = "s";
 var jugador2Subir = "ArrowUp";
 var jugador2Bajar = "ArrowDown";
-
-function cambiarTeclas() {
-    jugador1Subir = window.prompt("Ingresa la tecla para que el jugador 1 suba (actual: " + jugador1Subir + "):");
-    jugador1Bajar = window.prompt("Ingresa la tecla para que el jugador 1 baje (actual: " + jugador1Bajar + "):");
-    jugador2Subir = window.prompt("Ingresa la tecla para que el jugador 2 suba (actual: " + jugador2Subir + "):");
-    jugador2Bajar = window.prompt("Ingresa la tecla para que el jugador 2 baje (actual: " + jugador2Bajar + "):");
-}
-
-// Event listener para detectar cuando se presiona la tecla ESC
-document.addEventListener("keydown", function (event) {
-    if (event.key === "Escape") {
-        cambiarTeclas();
-    }
-});
-
-window.addEventListener("keydown", presionarTecla, false);
-
-function presionarTecla(e) {
-    const key = e.key
-    console.log(e.key)
-    if (key == jugador1Subir && jugador1.y - jugador1.gravity > 0) {
-        jugador1.y -= jugador1.gravity * 4;
-    }
-    else if (key == jugador1Bajar &&
-        jugador1.y + jugador1.height + jugador1.gravity < canvas.height) {
-        jugador1.y += jugador1.gravity * 4;
-    }
-    if (key == jugador2Subir && jugador2.y - jugador2.gravity > 0) {
-        jugador2.y -= jugador2.gravity * 4;
-    }
-    else if (key == jugador2Bajar &&
-        jugador2.y + jugador2.height + jugador2.gravity < canvas.height) {
-        jugador2.y += jugador2.gravity * 4;
-    }
-}
 
 class Element {
     constructor(opciones) {
@@ -67,7 +32,7 @@ const jugador1 = new Element({
     y: 200 - 40,
     width: 15,
     height: 80,
-    color: "blue",
+    color: "#0000ff",
     gravity: 2,
 })
 
@@ -76,7 +41,7 @@ const jugador2 = new Element({
     y: 200 - 40,
     width: 15,
     height: 80,
-    color: "red",
+    color: "#ff0000",
     gravity: 2,
 })
 const pelota = new Element({
@@ -113,9 +78,143 @@ const campoJugador2 = new Element({
     circle: true,
 })
 
+const upKeyInput = document.getElementById('up-key-input-1');
+const downKeyInput = document.getElementById('down-key-input-1');
+const colorInput = document.getElementById('color-input-1');
+const upKeyInput2 = document.getElementById('up-key-input-2');
+const downKeyInput2 = document.getElementById('down-key-input-2');
+const colorInput2 = document.getElementById('color-input-2');
+const titulojugador = document.getElementById('jugador-1');
+const titulojugador2 = document.getElementById('jugador-2');
+
+upKeyInput.value = jugador1Subir;
+downKeyInput.value = jugador1Bajar;
+upKeyInput2.value = jugador2Subir;
+downKeyInput2.value = jugador2Bajar;
+colorInput.value = jugador1.color;
+colorInput2.value = jugador2.color;
+titulojugador.style.color = jugador1.color;
+titulojugador2.style.color = jugador2.color;
+
+
+// Selección de elementos del DOM
+const optionsMenu = document.getElementById('options-menu');
+const optionsForm = document.getElementById('update-keys');
+
+// Función para abrir el menú de opciones
+function openOptionsMenu() {
+    optionsMenu.style.display = 'block';
+    window.cancelAnimationFrame(animacion)
+}
+
+// Función para cerrar el menú de opciones
+function closeOptionsMenu() {
+    optionsMenu.style.display = 'none';
+    window.requestAnimationFrame(bucle)
+}
+
+
+
+// Asignar eventos a los elementos del DOM
+document.addEventListener('keydown', (event) => {
+    if (event.code === 'Escape') {
+        if (optionsMenu.style.display == 'block') {
+            closeOptionsMenu();
+        } else {
+            openOptionsMenu()
+        }
+    }
+});
+
+function guardarCambios() {
+    jugador1Subir = upKeyInput.value;
+    jugador1Bajar = downKeyInput.value;
+    jugador2Subir = upKeyInput2.value;
+    jugador2Bajar = downKeyInput2.value;
+    jugador1.color = colorInput.value;
+    jugador2.color = colorInput2.value;
+    titulojugador.style.color = jugador1.color;
+    titulojugador2.style.color = jugador2.color;
+    console.log(jugador1.color)
+    closeOptionsMenu()
+
+
+}
+
+// Función para capturar la primera tecla que se pulse
+function captureFirstKey(event, input) {
+    event.preventDefault();
+    const key = event.key;
+    const existingInput = document.querySelector(`input[value="${key}"]:not(#${input.id})`);
+    console.log(existingInput)
+    if (existingInput) {
+        existingInput.value = '';
+    }
+    input.value = key;
+    input.removeEventListener('keydown', captureFirstKey);
+}
+
+console.log(document.querySelector('input'))
+// Agregar eventos de clic a los campos de entrada
+upKeyInput.addEventListener('click', () => {
+    upKeyInput.addEventListener('keydown', (event) => {
+        captureFirstKey(event, upKeyInput);
+    });
+});
+
+downKeyInput.addEventListener('click', () => {
+    downKeyInput.addEventListener('keydown', (event) => {
+        captureFirstKey(event, downKeyInput);
+    });
+});
+
+upKeyInput2.addEventListener('click', () => {
+    upKeyInput2.addEventListener('keydown', (event) => {
+        captureFirstKey(event, upKeyInput2);
+    });
+});
+
+downKeyInput2.addEventListener('click', () => {
+    downKeyInput2.addEventListener('keydown', (event) => {
+        captureFirstKey(event, downKeyInput2);
+    });
+});
+
+
+
+
+
+
+
+
+window.addEventListener("keydown", presionarTecla, false);
+
+function presionarTecla(e) {
+    const key = e.key
+    console.log(e.key)
+    if (key == jugador1Subir && jugador1.y - jugador1.gravity > 0) {
+        jugador1.y -= jugador1.gravity * 4;
+    }
+    else if (key == jugador1Bajar &&
+        jugador1.y + jugador1.height + jugador1.gravity < canvas.height) {
+        jugador1.y += jugador1.gravity * 4;
+    }
+    if (key == jugador2Subir && jugador2.y - jugador2.gravity > 0) {
+        jugador2.y -= jugador2.gravity * 4;
+    }
+    else if (key == jugador2Bajar &&
+        jugador2.y + jugador2.height + jugador2.gravity < canvas.height) {
+        jugador2.y += jugador2.gravity * 4;
+    }
+}
+
+
+
 function drawField(element) {
     context.beginPath();
     context.setLineDash([5, 10]);
+    context.strokeStyle = element.color;
+
 
     if (element.circle) {
         context.arc(element.x, element.y, element.r, 0, 2 * Math.PI);
@@ -150,30 +249,30 @@ function drawElement(element) {
 
 function drawMarcador1() {
     context.font = "18px Arial";
-    context.fillStyle = "blue";
+    context.fillStyle = jugador1.color;
     context.fillText(marcador1, canvas.width / 2 - 60, 30)
 }
 function drawMarcador2() {
     context.font = "18px Arial";
-    context.fillStyle = "red";
+    context.fillStyle = jugador2.color;
     context.fillText(marcador2, canvas.width / 2 + 51, 30)
 }
 function drawElements() {
     context.clearRect(0, 0, canvas.width, canvas.height)
-    drawElement(jugador1);
-    drawElement(jugador2);
-    drawElement(pelota);
     drawField(campo);
     drawField(campoJugador1)
     drawField(campoJugador2)
     drawField(campoCentro)
     drawMarcador1()
     drawMarcador2()
+    drawElement(jugador1);
+    drawElement(jugador2);
+    drawElement(pelota);
 }
-function ramdonNumberGenerator(numero){
+function ramdonNumberGenerator(numero) {
     let numeroAleatorio
     do {
-        numeroAleatorio = Math.random()* numero - numero /2  
+        numeroAleatorio = Math.random() * numero - numero / 2
     } while (numeroAleatorio >= -1.5 && numeroAleatorio <= 1.5);
     return numeroAleatorio
 }
@@ -182,7 +281,6 @@ function resetPelota() {
     pelota.y = canvas.height / 2 - pelota.height / 2;
     pelota.speed = ramdonNumberGenerator(4.5)
     pelota.gravity = Math.random() * 6 - 3;
-    console.log(pelota.speed , pelota.gravity )
 }
 
 function rebotar() {
@@ -203,7 +301,7 @@ function colisionar() {
         pelota.y <= jugador2.y + jugador2.height) {
         pelota.speed = -pelota.speed;
         pelota.gravity = Math.random() * 2 - 1;
-        pelota.speed *= 1.1; 
+        pelota.speed *= 1.1;
         pelota.gravity *= 1.1;
     }
 
@@ -213,7 +311,7 @@ function colisionar() {
         pelota.y <= jugador1.y + jugador1.height) {
         pelota.speed = -pelota.speed;
         pelota.gravity = Math.random() * 2 - 1;
-        pelota.speed *= 1.1; 
+        pelota.speed *= 1.1;
         pelota.gravity *= 1.1;
     }
 
@@ -234,7 +332,7 @@ function bucle() {
     drawElements()
     rebotar()
     colisionar()
-    window.requestAnimationFrame(bucle)
+    animacion = window.requestAnimationFrame(bucle)
 }
 bucle()
 
